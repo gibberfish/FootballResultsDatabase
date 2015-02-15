@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="M2_REPO/mysql/mysql-connector-java/5.1.10/mysql-connector-java-5.1.10.jar"/>
 	<classpathentry kind="lib" path="C:/dev/mongo-java-driver-2.12.3.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/football-results-loader"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

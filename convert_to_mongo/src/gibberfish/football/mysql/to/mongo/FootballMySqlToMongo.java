@@ -15,6 +15,10 @@ import java.util.Set;
 
 import org.bson.types.ObjectId;
 
+import uk.co.mindbadger.footballresults.loader.mapping.FootballResultsMapping;
+import uk.co.mindbadger.xml.XMLFileReader;
+import uk.co.mindbadger.xml.XMLFileWriter;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -29,7 +33,7 @@ public class FootballMySqlToMongo {
 
 	// Database credentials
 	static final String USER = "root";
-	static final String PASS = "root";
+	static final String PASS = "sminge1";
 	
 	
 	private Connection conn;
@@ -38,6 +42,10 @@ public class FootballMySqlToMongo {
 	
 	private Map<Integer, String> divisionIdMap = new HashMap<Integer, String> ();
 	private Map<Integer, String> teamIdMap = new HashMap<Integer, String> ();
+	
+	private XMLFileReader reader = new XMLFileReader ();
+	private XMLFileWriter writer = new XMLFileWriter ();
+	private FootballResultsMapping mapping = new FootballResultsMapping("C:\\Mark\\appConfig\\fra_mapping2.xml", reader, writer);
 	
 	public FootballMySqlToMongo (String url, String username, String password) throws Exception {
 		client = new MongoClient("localhost");			
@@ -59,6 +67,7 @@ public class FootballMySqlToMongo {
 			convertTeams();
 			convertSeasonStructure();
 			convertFixtures ();
+			mapping.saveMappings();
 		} finally {
 			if (conn != null) conn.close();
 		}
@@ -77,6 +86,8 @@ public class FootballMySqlToMongo {
 				
 			while (rs.next()) {
 				int divId = rs.getInt("div_id");
+				String divIdAsString = (new Integer(divId)).toString();
+				
 				String divName = rs.getString("div_name");
 					
 				BasicDBObject division = new BasicDBObject("div_name", divName); 
@@ -84,6 +95,8 @@ public class FootballMySqlToMongo {
 				ObjectId id = (ObjectId)division.get( "_id" );
 								
 				divisionIdMap.put(divId, id.toString());
+				
+				mapping.addDivisionMapping("soccerbase", divIdAsString, id.toString());
 				
 				System.out.println("ID Inserted : " + id);
 			}
@@ -108,6 +121,8 @@ public class FootballMySqlToMongo {
 				
 			while (rs.next()) {
 				int teamId = rs.getInt("team_id");
+				String teamIdAsString = (new Integer(teamId)).toString();
+				
 				String teamName = rs.getString("team_name");
 					
 				BasicDBObject team = new BasicDBObject("team_name", teamName); 
@@ -115,6 +130,8 @@ public class FootballMySqlToMongo {
 				ObjectId id = (ObjectId)team.get( "_id" );
 								
 				teamIdMap.put(teamId, id.toString());
+				
+				mapping.addTeamMapping("soccerbase", teamIdAsString, id.toString());
 				
 				System.out.println("Team added with id : " + id);
 			}
